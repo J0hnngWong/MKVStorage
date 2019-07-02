@@ -177,6 +177,13 @@
                         <action selector="munmapFile:" destination="-1" eventType="touchUpInside" id="7AV-RV-1f8"/>
                     </connections>
                 </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RkV-18-EHT">
+                    <rect key="frame" x="168" y="688" width="78" height="30"/>
+                    <state key="normal" title="BenchMark"/>
+                    <connections>
+                        <action selector="benchMarkButton:" destination="-1" eventType="touchUpInside" id="O9Z-vN-7gw"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
@@ -187,6 +194,7 @@
                 <constraint firstItem="ooo-ik-HuH" firstAttribute="top" secondItem="RSJ-8N-GHI" secondAttribute="top" constant="60" id="JQ2-FA-vMK"/>
                 <constraint firstItem="m4Q-WR-bat" firstAttribute="centerY" secondItem="RSJ-8N-GHI" secondAttribute="centerY" id="Jwh-Cs-aoR"/>
                 <constraint firstItem="vNT-kU-a43" firstAttribute="centerX" secondItem="RSJ-8N-GHI" secondAttribute="centerX" id="KZQ-Xd-ebz"/>
+                <constraint firstItem="RkV-18-EHT" firstAttribute="centerX" secondItem="RSJ-8N-GHI" secondAttribute="centerX" id="L8d-nL-8dd"/>
                 <constraint firstItem="QNo-8K-bEB" firstAttribute="top" secondItem="RSJ-8N-GHI" secondAttribute="top" constant="60" id="LBZ-hN-idk"/>
                 <constraint firstItem="t8J-uD-ifn" firstAttribute="top" secondItem="qfT-sz-kaI" secondAttribute="bottom" constant="20" id="LuW-xx-y8p"/>
                 <constraint firstItem="qfT-sz-kaI" firstAttribute="top" secondItem="m4Q-WR-bat" secondAttribute="bottom" constant="20" id="Qe2-sZ-NpR"/>
@@ -194,6 +202,7 @@
                 <constraint firstItem="vNT-kU-a43" firstAttribute="top" secondItem="t8J-uD-ifn" secondAttribute="bottom" constant="20" id="Rgn-Ev-vsk"/>
                 <constraint firstItem="m4Q-WR-bat" firstAttribute="centerX" secondItem="RSJ-8N-GHI" secondAttribute="centerX" id="WF7-ed-fcW"/>
                 <constraint firstItem="kLc-6H-usa" firstAttribute="top" secondItem="vNT-kU-a43" secondAttribute="bottom" constant="20" id="dO4-uV-ftc"/>
+                <constraint firstItem="RkV-18-EHT" firstAttribute="top" secondItem="kLc-6H-usa" secondAttribute="bottom" constant="20" id="eTG-e2-aD6"/>
                 <constraint firstItem="zAd-Tj-0dx" firstAttribute="top" secondItem="RSJ-8N-GHI" secondAttribute="top" constant="60" id="ebK-mE-Pwg"/>
                 <constraint firstItem="t8J-uD-ifn" firstAttribute="centerX" secondItem="RSJ-8N-GHI" secondAttribute="centerX" id="o6o-q6-l7K"/>
             </constraints>

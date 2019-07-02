@@ -14,6 +14,9 @@
 		784EDF3E22BB2AC4001D24E1 /* MKVSTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 784EDF3D22BB2AC4001D24E1 /* MKVSTests.m */; };
 		784EDF4922BB2AC4001D24E1 /* MKVSUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 784EDF4822BB2AC4001D24E1 /* MKVSUITests.m */; };
 		784EDF5922BB2B12001D24E1 /* MKVStorageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 784EDF5822BB2B12001D24E1 /* MKVStorageManager.m */; };
+		788C942A22CB054700651B53 /* NormalFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 788C942922CB054700651B53 /* NormalFileManager.m */; };
+		788C942E22CB2CCC00651B53 /* NFMDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 788C942C22CB2CCC00651B53 /* NFMDemoViewController.m */; };
+		788C942F22CB2CCC00651B53 /* NFMDemoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 788C942D22CB2CCC00651B53 /* NFMDemoViewController.xib */; };
 		78BF87CD22C4B0F60026D06A /* MKVSDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 78BF87CB22C4B0F60026D06A /* MKVSDemoViewController.m */; };
 		78BF87CE22C4B0F60026D06A /* MKVSDemoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 78BF87CC22C4B0F60026D06A /* MKVSDemoViewController.xib */; };
 /* End PBXBuildFile section */
@@ -51,6 +54,11 @@
 		784EDF4A22BB2AC4001D24E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		784EDF5722BB2B12001D24E1 /* MKVStorageManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MKVStorageManager.h; sourceTree = "<group>"; };
 		784EDF5822BB2B12001D24E1 /* MKVStorageManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MKVStorageManager.m; sourceTree = "<group>"; };
+		788C942822CB054700651B53 /* NormalFileManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NormalFileManager.h; sourceTree = "<group>"; };
+		788C942922CB054700651B53 /* NormalFileManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NormalFileManager.m; sourceTree = "<group>"; };
+		788C942B22CB2CCC00651B53 /* NFMDemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NFMDemoViewController.h; sourceTree = "<group>"; };
+		788C942C22CB2CCC00651B53 /* NFMDemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NFMDemoViewController.m; sourceTree = "<group>"; };
+		788C942D22CB2CCC00651B53 /* NFMDemoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NFMDemoViewController.xib; sourceTree = "<group>"; };
 		78BF87CA22C4B0F60026D06A /* MKVSDemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MKVSDemoViewController.h; sourceTree = "<group>"; };
 		78BF87CB22C4B0F60026D06A /* MKVSDemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MKVSDemoViewController.m; sourceTree = "<group>"; };
 		78BF87CC22C4B0F60026D06A /* MKVSDemoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MKVSDemoViewController.xib; sourceTree = "<group>"; };
@@ -104,6 +112,7 @@
 		784EDF2322BB2AC2001D24E1 /* MKVS */ = {
 			isa = PBXGroup;
 			children = (
+				788C942722CB052600651B53 /* NSFileManager */,
 				78BF87C922C4B0DB0026D06A /* MKVSDemo */,
 				784EDF5622BB2AD2001D24E1 /* MKVS */,
 				784EDF2422BB2AC2001D24E1 /* AppDelegate.h */,
@@ -143,12 +152,24 @@
 			path = MKVS;
 			sourceTree = "<group>";
 		};
+		788C942722CB052600651B53 /* NSFileManager */ = {
+			isa = PBXGroup;
+			children = (
+				788C942822CB054700651B53 /* NormalFileManager.h */,
+				788C942922CB054700651B53 /* NormalFileManager.m */,
+			);
+			path = NSFileManager;
+			sourceTree = "<group>";
+		};
 		78BF87C922C4B0DB0026D06A /* MKVSDemo */ = {
 			isa = PBXGroup;
 			children = (
 				78BF87CA22C4B0F60026D06A /* MKVSDemoViewController.h */,
 				78BF87CB22C4B0F60026D06A /* MKVSDemoViewController.m */,
 				78BF87CC22C4B0F60026D06A /* MKVSDemoViewController.xib */,
+				788C942B22CB2CCC00651B53 /* NFMDemoViewController.h */,
+				788C942C22CB2CCC00651B53 /* NFMDemoViewController.m */,
+				788C942D22CB2CCC00651B53 /* NFMDemoViewController.xib */,
 			);
 			path = MKVSDemo;
 			sourceTree = "<group>";
@@ -259,6 +280,7 @@
 				78BF87CE22C4B0F60026D06A /* MKVSDemoViewController.xib in Resources */,
 				784EDF3122BB2AC4001D24E1 /* LaunchScreen.storyboard in Resources */,
 				784EDF2E22BB2AC4001D24E1 /* Assets.xcassets in Resources */,
+				788C942F22CB2CCC00651B53 /* NFMDemoViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,10 +305,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				788C942A22CB054700651B53 /* NormalFileManager.m in Sources */,
 				784EDF5922BB2B12001D24E1 /* MKVStorageManager.m in Sources */,
 				78BF87CD22C4B0F60026D06A /* MKVSDemoViewController.m in Sources */,
 				784EDF3422BB2AC4001D24E1 /* main.m in Sources */,
 				784EDF2622BB2AC2001D24E1 /* AppDelegate.m in Sources */,
+				788C942E22CB2CCC00651B53 /* NFMDemoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

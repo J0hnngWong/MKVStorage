@@ -8,12 +8,18 @@
 
 #import "MKVSDemoViewController.h"
 #import "MKVStorageManager.h"
+#import "NormalFileManager.h"
+#import "NFMDemoViewController.h"
 
 @interface MKVSDemoViewController ()
 
 @property (nonatomic, strong) MKVStorageManager *storageManager;
 
+@property (nonatomic, strong) NormalFileManager *normalManager;
+
 @property (nonatomic, assign) int times;
+@property (nonatomic, assign) long startTime;
+@property (nonatomic, assign) long endTime;
 
 @end
 
@@ -109,6 +115,41 @@
 - (IBAction)munmapFile:(id)sender {
     [self.storageManager unmapAndCloseFile];
 }
+- (IBAction)benchMarkButton:(id)sender {
+    {
+        NSMutableString *stringValue = [NSMutableString stringWithString:@"string1"];
+        NSMutableString *stringKey = [NSMutableString stringWithString:@"string1"];
+        self.startTime = [[NSDate date] timeIntervalSince1970] * 10000000;
+        for (int i = 170*self.times; i < 170*(self.times+1); i++) {
+            stringValue = [NSMutableString stringWithFormat:@"%@%d", @"string", i];
+            stringKey = stringValue;
+            if (![self.storageManager setStringValue:stringValue forKey:stringKey]) {
+                printf("write fail");
+                break;
+            }
+        }
+        self.endTime = [[NSDate date] timeIntervalSince1970] * 10000000;
+        NSLog(@"MKVS spend %ld seconds to write 170 string to file", self.endTime - self.startTime);
+        self.times++;
+    }
+    self.times = 0;
+    {
+        NSMutableString *stringValue2 = [NSMutableString stringWithString:@"string1"];
+        NSMutableString *stringKey2 = [NSMutableString stringWithString:@"string1"];
+        self.startTime = [[NSDate date] timeIntervalSince1970] * 10000000;
+        for (int i = 170*self.times; i < 170*(self.times+1); i++) {
+            stringValue2 = [NSMutableString stringWithFormat:@"%@%d", @"string", i];
+            stringKey2 = stringValue2;
+            if (![self.normalManager setStringValue:stringValue2 forKey:stringValue2]) {
+                printf("write fail");
+                break;
+            }
+        }
+        self.endTime = [[NSDate date] timeIntervalSince1970] * 10000000;
+        NSLog(@"NFM spend %ld seconds to write 170 string to file", self.endTime - self.startTime);
+        self.times++;
+    }
+}
 
 - (MKVStorageManager *)storageManager
 {
@@ -116,6 +157,14 @@
         _storageManager = [[MKVStorageManager alloc] init];
     }
     return _storageManager;
+}
+
+- (NormalFileManager *)normalManager
+{
+    if (_normalManager == nil) {
+        _normalManager = [[NormalFileManager alloc] init];
+    }
+    return _normalManager;
 }
 
 @end
