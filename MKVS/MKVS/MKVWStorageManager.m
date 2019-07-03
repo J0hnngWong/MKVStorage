@@ -1,21 +1,21 @@
 //
-//  MKVKAStorageManager.m
-//  MKVKAS
+//  MKVWStorageManager.m
+//  MKVWS
 //
 //  Created by 王嘉宁 on 2019/6/20.
 //  Copyright © 2019 Johnny. All rights reserved.
 //
 
-#import "MKVKAStorageManager.h"
+#import "MKVWStorageManager.h"
 #import <UIKit/UIKit.h>
 #import <sys/mman.h>
 #import <sys/stat.h>
 
 //the best size of each file is a few virtual memory pages in size
 
-@interface MKVKAStorageManager ()
+@interface MKVWStorageManager ()
 
-//@property (strong, nonatomic, readwrite) MKVKAStorageManager *defaultManager;
+//@property (strong, nonatomic, readwrite) MKVWStorageManager *defaultManager;
 
 @property (strong, nonatomic, readwrite) dispatch_semaphore_t file_operation_lock;
 @property (strong, nonatomic, readwrite) NSString *filePath;
@@ -26,6 +26,7 @@
 @property (strong, nonatomic, readwrite) NSError *error;
 //c文件操作需要的变量
 @property (assign, nonatomic, readwrite) int32_t file_descriptor;
+@property (assign, nonatomic, readwrite) int64_t file_position;
 @property (assign, nonatomic, readwrite) size_t file_size;
 @property (assign, nonatomic, readwrite) void * file_ptr;
 //c error code
@@ -33,14 +34,14 @@
 
 @end
 
-@implementation MKVKAStorageManager
+@implementation MKVWStorageManager
 
 //+ (instancetype)defaultManager
 //{
 //    static id manager = nil;
 //    static dispatch_once_t onceToken;
 //    dispatch_once(&onceToken, ^{
-//        manager = [[MKVKAStorageManager alloc] init];
+//        manager = [[MKVWStorageManager alloc] init];
 //    });
 //    return manager;
 //}
@@ -52,7 +53,7 @@
     self = [super init];
     if (self) {
         self.file_operation_lock = dispatch_semaphore_create(1);
-        [self setWorkPath:MKVKASDefaultFilePath fileName:MKVKASDefaultFileName];
+        [self setWorkPath:MKVWSDefaultFilePath fileName:MKVWSDefaultFileName];
     }
     return self;
 }
@@ -71,7 +72,7 @@
 
 - (void)setWorkFileName:(NSString *)fileName
 {
-    [self setWorkPath:MKVKASDefaultFilePath fileName:fileName];
+    [self setWorkPath:MKVWSDefaultFilePath fileName:fileName];
 }
 
 - (void)setWorkPath:(NSString *)path fileName:(NSString *)fileName
@@ -95,12 +96,12 @@
 
 - (BOOL)removeDefaultFile
 {
-    return [self removeFileInPath:MKVKASDefaultFilePath fileName:MKVKASDefaultFileName];
+    return [self removeFileInPath:MKVWSDefaultFilePath fileName:MKVWSDefaultFileName];
 }
 
 - (BOOL)removeFileInDefaultPathWithFileName:(NSString *)fileName
 {
-    return [self removeFileInPath:MKVKASDefaultFilePath fileName:fileName];
+    return [self removeFileInPath:MKVWSDefaultFilePath fileName:fileName];
 }
 
 - (BOOL)removeFileInPath:(NSString *)path fileName:(NSString *)fileName
@@ -176,7 +177,7 @@
     if (![self preWriteDictToFileWith:boolValue key:key]) {
         return NO;
     }
-    return [self _writeToMemory];
+    return [self _writeToMemoryWith:[NSString stringWithFormat:@",\"%@\":%ld}", key, boolValue.integerValue]];
 }
 
 - (BOOL)setIntValue:(NSInteger)value forKey:(NSString *)key
@@ -185,15 +186,15 @@
     if (![self preWriteDictToFileWith:intValue key:key]) {
         return NO;
     }
-    return [self _writeToMemory];
+    return [self _writeToMemoryWith:[NSString stringWithFormat:@",\"%@\":%ld}", key, intValue.integerValue]];
 }
 
 - (BOOL)setStringValue:(NSString *)value forKey:(NSString *)key
 {
-    if (![self preWriteDictToFileWith:value key:key]) {
-        return NO;
-    }
-    return [self _writeToMemory];
+//    if (![self preWriteDictToFileWith:value key:key]) {
+//        return NO;
+//    }
+    return [self _writeToMemoryWith:[NSString stringWithFormat:@",\"%@\":\"%@\"}", key, value]];
 }
 
 - (BOOL)setFloatValue:(float)value forKey:(NSString *)key
@@ -202,7 +203,7 @@
     if (![self preWriteDictToFileWith:floatValue key:key]) {
         return NO;
     }
-    return [self _writeToMemory];
+    return [self _writeToMemoryWith:[NSString stringWithFormat:@",\"%@\":%f}", key, floatValue.floatValue]];
 }
 
 - (BOOL)setDateValue:(NSDate *)value forKey:(NSString *)key
@@ -305,7 +306,7 @@
         dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
         [self.cacheDictionary removeObjectForKey:key];
         dispatch_semaphore_signal(self.file_operation_lock);
-        [self _writeToMemory];
+//        [self _writeToMemory];
         return YES;
     }
 }
@@ -358,10 +359,10 @@
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
     if (is_empty_string(self.filePath)) {
-        self.filePath = MKVKASDefaultFilePath;
+        self.filePath = MKVWSDefaultFilePath;
     }
     if (is_empty_string(self.fileName)) {
-        self.fileName = MKVKASDefaultFileName;
+        self.fileName = MKVWSDefaultFileName;
     }
     //如果名字中含有路径内容，就返回NO
     if ([self.fileName containsString:@"/"]) {
@@ -392,6 +393,7 @@
         }
         NSData *data = [NSJSONSerialization dataWithJSONObject:self.cacheDictionary options:NSJSONWritingSortedKeys error:nil];
         if (![fileManager createFileAtPath:fileFullPath contents:data attributes:nil]) {
+            self.file_position = 1;
             dispatch_semaphore_signal(self.file_operation_lock);
             return NO;
         }
@@ -447,6 +449,7 @@
         return nil;
     }
     self.file_size = file_stat.st_size;
+    self.file_position = file_stat.st_size - 1;
     self.file_ptr = memory_ptr;
     //将读出的数据读入内存当中
     if (self.file_ptr) {
@@ -460,7 +463,7 @@
 
 #pragma mark - mmap write
 
-- (BOOL)_writeToMemory
+- (BOOL)_writeToMemoryWith:(NSString *)stringData
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
     if (self.cacheDictionary == nil) {
@@ -468,20 +471,17 @@
         printf("cache dictionary is nil");
         return NO;
     }
-    //序列化
-    NSData *data = [NSJSONSerialization dataWithJSONObject:self.cacheDictionary options:NSJSONWritingSortedKeys error:nil];
-    NSMutableData *writeData = [NSMutableData dataWithData:data];
-//    if (writeData.length > MAX_FILE_SIZE) {
-//        printf("reach max file size");
-//        dispatch_semaphore_signal(self.file_operation_lock);
-//        return NO;
-//    }
-    self.file_size = writeData.length;
+    if (self.file_position == 1) {
+        stringData = [stringData substringWithRange:NSMakeRange(1, stringData.length - 1)];
+    }
+    const char *cstringData = stringData.UTF8String;
+    self.file_size += stringData.length;
     //修改文件大小
     ftruncate(self.file_descriptor, self.file_size);
     //将要写入的内容拷贝到内存的file_ptr所指向的内存当中
-    if (self.file_ptr && writeData.mutableBytes && self.file_size > 0 && self.file_ptr != ((void *)-1)) {
-        memcpy(self.file_ptr, writeData.mutableBytes, self.file_size);
+    if (self.file_ptr && self.file_size > 0 && self.file_ptr != ((void *)-1)) {
+        memcpy(self.file_ptr + self.file_position, cstringData, stringData.length);
+        self.file_position += stringData.length - 1;
         dispatch_semaphore_signal(self.file_operation_lock);
         return YES;
     } else {
@@ -495,7 +495,7 @@
 {
     NSData *data = [NSJSONSerialization dataWithJSONObject:self.cacheDictionary options:NSJSONWritingSortedKeys error:nil];
 //    if (data && data.length > MAX_FILE_SIZE) {
-        [NSNotificationCenter.defaultCenter postNotificationName:kMKVKAReadyToWriteDataIsReachMaxFileSizeNotification object:data userInfo:self.cacheDictionary];
+        [NSNotificationCenter.defaultCenter postNotificationName:kMKVWReadyToWriteDataIsReachMaxFileSizeNotification object:data userInfo:self.cacheDictionary];
         return YES;
 //    }
     return NO;

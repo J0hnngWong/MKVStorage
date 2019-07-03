@@ -1,6 +1,6 @@
 //
-//  MKVKAStorageManager.h
-//  MKVKAS
+//  MKVWStorageManager.h
+//  MKVWS
 //
 //  Created by 王嘉宁 on 2019/6/20.
 //  Copyright © 2019 Johnny. All rights reserved.
@@ -8,16 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
-#define kMKVKAReadyToWriteDataIsReachMaxFileSizeNotification @"readyToWriteDataIsReachMaxFileSizeNotification"
+#define kMKVWReadyToWriteDataIsReachMaxFileSizeNotification @"readyToWriteDataIsReachMaxFileSizeNotification"
 
-#define MKVKASDefaultFilePath [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"DaDa/MKVKAS"]
-#define MKVKASDocumentFilePath NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject
+#define MKVWSDefaultFilePath [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"DaDa/MKVWS"]
+#define MKVWSDocumentFilePath NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject
 
-#define MKVKASDefaultFileName @"defaultStorage"
+#define MKVWSDefaultFileName @"defaultStorage"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MKVKAStorageManager : NSObject
+@interface MKVWStorageManager : NSObject
 
 //+ (instancetype)defaultManager;
 /// initialize
