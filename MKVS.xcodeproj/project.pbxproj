@@ -19,6 +19,7 @@
 		788C942F22CB2CCC00651B53 /* NFMDemoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 788C942D22CB2CCC00651B53 /* NFMDemoViewController.xib */; };
 		78BF87CD22C4B0F60026D06A /* MKVSDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 78BF87CB22C4B0F60026D06A /* MKVSDemoViewController.m */; };
 		78BF87CE22C4B0F60026D06A /* MKVSDemoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 78BF87CC22C4B0F60026D06A /* MKVSDemoViewController.xib */; };
+		78D5384F22CC474A00ABB14B /* MKVKAStorageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D5384E22CC474A00ABB14B /* MKVKAStorageManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +63,8 @@
 		78BF87CA22C4B0F60026D06A /* MKVSDemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MKVSDemoViewController.h; sourceTree = "<group>"; };
 		78BF87CB22C4B0F60026D06A /* MKVSDemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MKVSDemoViewController.m; sourceTree = "<group>"; };
 		78BF87CC22C4B0F60026D06A /* MKVSDemoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MKVSDemoViewController.xib; sourceTree = "<group>"; };
+		78D5384D22CC474A00ABB14B /* MKVKAStorageManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKVKAStorageManager.h; sourceTree = "<group>"; };
+		78D5384E22CC474A00ABB14B /* MKVKAStorageManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MKVKAStorageManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +151,8 @@
 			children = (
 				784EDF5722BB2B12001D24E1 /* MKVStorageManager.h */,
 				784EDF5822BB2B12001D24E1 /* MKVStorageManager.m */,
+				78D5384D22CC474A00ABB14B /* MKVKAStorageManager.h */,
+				78D5384E22CC474A00ABB14B /* MKVKAStorageManager.m */,
 			);
 			path = MKVS;
 			sourceTree = "<group>";
@@ -308,6 +313,7 @@
 				788C942A22CB054700651B53 /* NormalFileManager.m in Sources */,
 				784EDF5922BB2B12001D24E1 /* MKVStorageManager.m in Sources */,
 				78BF87CD22C4B0F60026D06A /* MKVSDemoViewController.m in Sources */,
+				78D5384F22CC474A00ABB14B /* MKVKAStorageManager.m in Sources */,
 				784EDF3422BB2AC4001D24E1 /* main.m in Sources */,
 				784EDF2622BB2AC2001D24E1 /* AppDelegate.m in Sources */,
 				788C942E22CB2CCC00651B53 /* NFMDemoViewController.m in Sources */,
