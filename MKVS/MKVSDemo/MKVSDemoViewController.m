@@ -103,7 +103,7 @@
     self.times++;
 }
 - (IBAction)changeFile:(id)sender {
-    [self.storageManager setWorkFileName:@"file1"];
+    [self.storageManager setWorkFileName:[NSString stringWithFormat:@"file%d", self.times]];
 }
 
 - (IBAction)removeChangedFile:(id)sender {
