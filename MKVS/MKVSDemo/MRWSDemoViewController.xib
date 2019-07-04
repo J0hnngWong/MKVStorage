@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="MRWSDemoViewController">
+            <connections>
+                <outlet property="logContentTextField" destination="Kbq-S4-QvY" id="l7e-xN-BLL"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nO7-ZR-5a3">
+                    <rect key="frame" x="156" y="438" width="102" height="30"/>
+                    <state key="normal" title="write log to file"/>
+                    <connections>
+                        <action selector="writeLogAction:" destination="-1" eventType="touchUpInside" id="afW-Fb-uUT"/>
+                    </connections>
+                </button>
+                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Kbq-S4-QvY">
+                    <rect key="frame" x="20" y="357" width="374" height="30"/>
+                    <nil key="textColor"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits"/>
+                </textField>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nMw-YD-xdy">
+                    <rect key="frame" x="183.5" y="497" width="47" height="30"/>
+                    <state key="normal" title="unmap"/>
+                    <connections>
+                        <action selector="unmapAction:" destination="-1" eventType="touchUpInside" id="efz-0K-hFT"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JiY-1Z-UnG">
+                    <rect key="frame" x="168.5" y="599" width="77" height="30"/>
+                    <state key="normal" title="benchmark"/>
+                    <connections>
+                        <action selector="benchmarkAction:" destination="-1" eventType="touchUpInside" id="csS-ML-FlV"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="nMw-YD-xdy" firstAttribute="top" secondItem="nO7-ZR-5a3" secondAttribute="bottom" constant="29" id="5Q5-lV-xwF"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="Kbq-S4-QvY" secondAttribute="trailing" constant="20" id="A6y-v1-mqK"/>
+                <constraint firstItem="nO7-ZR-5a3" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="DSt-89-lyv"/>
+                <constraint firstItem="nO7-ZR-5a3" firstAttribute="top" secondItem="Kbq-S4-QvY" secondAttribute="bottom" constant="51" id="XgW-XL-rka"/>
+                <constraint firstItem="Kbq-S4-QvY" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="daM-ih-Y9Y"/>
+                <constraint firstItem="nO7-ZR-5a3" firstAttribute="centerY" secondItem="Q5M-cg-NOt" secondAttribute="centerY" id="kuB-l9-qdq"/>
+                <constraint firstItem="JiY-1Z-UnG" firstAttribute="top" secondItem="nMw-YD-xdy" secondAttribute="bottom" constant="72" id="z4e-r7-YEM"/>
+                <constraint firstItem="nMw-YD-xdy" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="zKy-df-LLo"/>
+                <constraint firstItem="JiY-1Z-UnG" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="zrD-lW-wch"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+        </view>
+    </objects>
+</document>

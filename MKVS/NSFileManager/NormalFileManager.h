@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)setStringValue:(NSString *)string forKey:(NSString *)key;
 
+- (NSString *)fileFullPath;
+
 @end
 
 NS_ASSUME_NONNULL_END

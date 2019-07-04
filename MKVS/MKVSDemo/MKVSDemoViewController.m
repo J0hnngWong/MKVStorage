@@ -10,6 +10,7 @@
 #import "MKVStorageManager.h"
 #import "NormalFileManager.h"
 #import "NFMDemoViewController.h"
+#import "MRWSDemoViewController.h"
 
 @interface MKVSDemoViewController ()
 
@@ -148,6 +149,15 @@
         self.endTime = [[NSDate date] timeIntervalSince1970] * 10000000;
         NSLog(@"NFM spend %ld seconds to write 170 string to file", self.endTime - self.startTime);
         self.times++;
+    }
+}
+
+- (IBAction)nextDemoButton:(id)sender {
+    MRWSDemoViewController *vc = [[MRWSDemoViewController alloc] init];
+    if (self.navigationController) {
+        [self.navigationController pushViewController:vc animated:YES];
+    } else {
+        [self presentViewController:vc animated:YES completion:nil];
     }
 }
 

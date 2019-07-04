@@ -184,6 +184,13 @@
                         <action selector="benchMarkButton:" destination="-1" eventType="touchUpInside" id="O9Z-vN-7gw"/>
                     </connections>
                 </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6fJ-YF-c0R">
+                    <rect key="frame" x="111.5" y="738" width="191" height="30"/>
+                    <state key="normal" title="MRWStorageManagerDemo"/>
+                    <connections>
+                        <action selector="nextDemoButton:" destination="-1" eventType="touchUpInside" id="H4c-xE-enR"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
@@ -201,9 +208,11 @@
                 <constraint firstItem="ooo-ik-HuH" firstAttribute="centerX" secondItem="RSJ-8N-GHI" secondAttribute="centerX" id="Rc1-4O-EI9"/>
                 <constraint firstItem="vNT-kU-a43" firstAttribute="top" secondItem="t8J-uD-ifn" secondAttribute="bottom" constant="20" id="Rgn-Ev-vsk"/>
                 <constraint firstItem="m4Q-WR-bat" firstAttribute="centerX" secondItem="RSJ-8N-GHI" secondAttribute="centerX" id="WF7-ed-fcW"/>
+                <constraint firstItem="6fJ-YF-c0R" firstAttribute="top" secondItem="RkV-18-EHT" secondAttribute="bottom" constant="20" id="caS-Wd-y5c"/>
                 <constraint firstItem="kLc-6H-usa" firstAttribute="top" secondItem="vNT-kU-a43" secondAttribute="bottom" constant="20" id="dO4-uV-ftc"/>
                 <constraint firstItem="RkV-18-EHT" firstAttribute="top" secondItem="kLc-6H-usa" secondAttribute="bottom" constant="20" id="eTG-e2-aD6"/>
                 <constraint firstItem="zAd-Tj-0dx" firstAttribute="top" secondItem="RSJ-8N-GHI" secondAttribute="top" constant="60" id="ebK-mE-Pwg"/>
+                <constraint firstItem="6fJ-YF-c0R" firstAttribute="centerX" secondItem="RSJ-8N-GHI" secondAttribute="centerX" id="gzu-pM-LKr"/>
                 <constraint firstItem="t8J-uD-ifn" firstAttribute="centerX" secondItem="RSJ-8N-GHI" secondAttribute="centerX" id="o6o-q6-l7K"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="RSJ-8N-GHI"/>

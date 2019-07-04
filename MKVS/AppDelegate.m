@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "MKVSDemoViewController.h"
+#import "RootNaviViewController.h"
 
 @interface AppDelegate ()
 
@@ -19,8 +20,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     MKVSDemoViewController *vc = [[MKVSDemoViewController alloc] init];
+    RootNaviViewController *naviVC = [[RootNaviViewController alloc] initWithRootViewController:vc];
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    self.window.rootViewController = vc;
+    self.window.rootViewController = naviVC;
     [self.window makeKeyAndVisible];
     return YES;
 }

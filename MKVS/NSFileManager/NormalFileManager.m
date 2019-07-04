@@ -32,6 +32,11 @@
     return [self writeToFile];
 }
 
+- (NSString *)fileFullPath
+{
+    return [NFMDefaultFilePath stringByAppendingFormat:@"/%@", NFMDefaultFileName];
+}
+
 - (BOOL)writeToFile
 {
     return [self.cacheDict writeToFile:[NFMDefaultFilePath stringByAppendingFormat:@"/%@", NFMDefaultFileName] atomically:YES];

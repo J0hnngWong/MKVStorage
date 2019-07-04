@@ -19,6 +19,11 @@
 		788C942F22CB2CCC00651B53 /* NFMDemoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 788C942D22CB2CCC00651B53 /* NFMDemoViewController.xib */; };
 		78BF87CD22C4B0F60026D06A /* MKVSDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 78BF87CB22C4B0F60026D06A /* MKVSDemoViewController.m */; };
 		78BF87CE22C4B0F60026D06A /* MKVSDemoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 78BF87CC22C4B0F60026D06A /* MKVSDemoViewController.xib */; };
+		78D5389622CDE55000ABB14B /* MRWStorageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D5389522CDE55000ABB14B /* MRWStorageManager.m */; };
+		78D5389A22CDEF6900ABB14B /* MRWSDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D5389822CDEF6900ABB14B /* MRWSDemoViewController.m */; };
+		78D5389B22CDEF6900ABB14B /* MRWSDemoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 78D5389922CDEF6900ABB14B /* MRWSDemoViewController.xib */; };
+		78D5389F22CDEFE300ABB14B /* RootNaviViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 78D5389D22CDEFE300ABB14B /* RootNaviViewController.m */; };
+		78D538A022CDEFE300ABB14B /* RootNaviViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 78D5389E22CDEFE300ABB14B /* RootNaviViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +67,14 @@
 		78BF87CA22C4B0F60026D06A /* MKVSDemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MKVSDemoViewController.h; sourceTree = "<group>"; };
 		78BF87CB22C4B0F60026D06A /* MKVSDemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MKVSDemoViewController.m; sourceTree = "<group>"; };
 		78BF87CC22C4B0F60026D06A /* MKVSDemoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MKVSDemoViewController.xib; sourceTree = "<group>"; };
+		78D5389422CDE55000ABB14B /* MRWStorageManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MRWStorageManager.h; sourceTree = "<group>"; };
+		78D5389522CDE55000ABB14B /* MRWStorageManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MRWStorageManager.m; sourceTree = "<group>"; };
+		78D5389722CDEF6900ABB14B /* MRWSDemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MRWSDemoViewController.h; sourceTree = "<group>"; };
+		78D5389822CDEF6900ABB14B /* MRWSDemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MRWSDemoViewController.m; sourceTree = "<group>"; };
+		78D5389922CDEF6900ABB14B /* MRWSDemoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MRWSDemoViewController.xib; sourceTree = "<group>"; };
+		78D5389C22CDEFE300ABB14B /* RootNaviViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootNaviViewController.h; sourceTree = "<group>"; };
+		78D5389D22CDEFE300ABB14B /* RootNaviViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootNaviViewController.m; sourceTree = "<group>"; };
+		78D5389E22CDEFE300ABB14B /* RootNaviViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RootNaviViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +130,9 @@
 				784EDF5622BB2AD2001D24E1 /* MKVS */,
 				784EDF2422BB2AC2001D24E1 /* AppDelegate.h */,
 				784EDF2522BB2AC2001D24E1 /* AppDelegate.m */,
+				78D5389C22CDEFE300ABB14B /* RootNaviViewController.h */,
+				78D5389D22CDEFE300ABB14B /* RootNaviViewController.m */,
+				78D5389E22CDEFE300ABB14B /* RootNaviViewController.xib */,
 				784EDF2D22BB2AC4001D24E1 /* Assets.xcassets */,
 				784EDF2F22BB2AC4001D24E1 /* LaunchScreen.storyboard */,
 				784EDF3222BB2AC4001D24E1 /* Info.plist */,
@@ -148,6 +164,8 @@
 			children = (
 				784EDF5722BB2B12001D24E1 /* MKVStorageManager.h */,
 				784EDF5822BB2B12001D24E1 /* MKVStorageManager.m */,
+				78D5389422CDE55000ABB14B /* MRWStorageManager.h */,
+				78D5389522CDE55000ABB14B /* MRWStorageManager.m */,
 			);
 			path = MKVS;
 			sourceTree = "<group>";
@@ -170,6 +188,9 @@
 				788C942B22CB2CCC00651B53 /* NFMDemoViewController.h */,
 				788C942C22CB2CCC00651B53 /* NFMDemoViewController.m */,
 				788C942D22CB2CCC00651B53 /* NFMDemoViewController.xib */,
+				78D5389722CDEF6900ABB14B /* MRWSDemoViewController.h */,
+				78D5389822CDEF6900ABB14B /* MRWSDemoViewController.m */,
+				78D5389922CDEF6900ABB14B /* MRWSDemoViewController.xib */,
 			);
 			path = MKVSDemo;
 			sourceTree = "<group>";
@@ -279,8 +300,10 @@
 			files = (
 				78BF87CE22C4B0F60026D06A /* MKVSDemoViewController.xib in Resources */,
 				784EDF3122BB2AC4001D24E1 /* LaunchScreen.storyboard in Resources */,
+				78D538A022CDEFE300ABB14B /* RootNaviViewController.xib in Resources */,
 				784EDF2E22BB2AC4001D24E1 /* Assets.xcassets in Resources */,
 				788C942F22CB2CCC00651B53 /* NFMDemoViewController.xib in Resources */,
+				78D5389B22CDEF6900ABB14B /* MRWSDemoViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,11 +328,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78D5389A22CDEF6900ABB14B /* MRWSDemoViewController.m in Sources */,
 				788C942A22CB054700651B53 /* NormalFileManager.m in Sources */,
 				784EDF5922BB2B12001D24E1 /* MKVStorageManager.m in Sources */,
 				78BF87CD22C4B0F60026D06A /* MKVSDemoViewController.m in Sources */,
+				78D5389F22CDEFE300ABB14B /* RootNaviViewController.m in Sources */,
 				784EDF3422BB2AC4001D24E1 /* main.m in Sources */,
 				784EDF2622BB2AC2001D24E1 /* AppDelegate.m in Sources */,
+				78D5389622CDE55000ABB14B /* MRWStorageManager.m in Sources */,
 				788C942E22CB2CCC00651B53 /* NFMDemoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
