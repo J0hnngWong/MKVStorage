@@ -14,6 +14,8 @@
 //the best size of each file is a few virtual memory pages in size
 #define MAX_FILE_SIZE 4096
 
+#define CURRENT_PAGE_NAME [NSString stringWithFormat:@"dict%ld", (long)self.currentPageNumber]
+
 @interface MKVPStorageManager ()
 
 //@property (strong, nonatomic, readwrite) MKVPStorageManager *defaultManager;
@@ -24,8 +26,9 @@
 @property (strong, nonatomic, readwrite) NSMutableDictionary *cacheDictionary;
 
 @property (assign, nonatomic, readwrite) NSInteger currentPageNumber;
-@property (strong, nonatomic, readwrite) NSString *pageName;
-@property (strong, nonatomic, readwrite) NSMutableDictionary *pageNameDictionary;
+@property (assign, nonatomic, readwrite) NSInteger totalPageNumber;
+@property (strong, nonatomic, readwrite) NSMutableSet *currentKeySet;
+@property (strong, nonatomic, readwrite) NSMutableDictionary<NSString *, NSMutableSet *> *pageIndexDictionary;
 
 //错误类型
 @property (strong, nonatomic, readwrite) NSError *error;
@@ -181,7 +184,8 @@
     if (![self preWriteDictToFileWith:boolValue key:key]) {
         return NO;
     }
-    return [self _writeToMemory];
+    [self.currentKeySet addObject:key];
+    return [self _writeToMemoryWithPageNumber:self.currentPageNumber];
 }
 
 - (BOOL)setIntValue:(NSInteger)value forKey:(NSString *)key
@@ -190,7 +194,8 @@
     if (![self preWriteDictToFileWith:intValue key:key]) {
         return NO;
     }
-    return [self _writeToMemory];
+    [self.currentKeySet addObject:key];
+    return [self _writeToMemoryWithPageNumber:self.currentPageNumber];
 }
 
 - (BOOL)setStringValue:(NSString *)value forKey:(NSString *)key
@@ -198,7 +203,8 @@
     if (![self preWriteDictToFileWith:value key:key]) {
         return NO;
     }
-    return [self _writeToMemory];
+    [self.currentKeySet addObject:key];
+    return [self _writeToMemoryWithPageNumber:self.currentPageNumber];
 }
 
 - (BOOL)setFloatValue:(float)value forKey:(NSString *)key
@@ -207,7 +213,8 @@
     if (![self preWriteDictToFileWith:floatValue key:key]) {
         return NO;
     }
-    return [self _writeToMemory];
+    [self.currentKeySet addObject:key];
+    return [self _writeToMemoryWithPageNumber:self.currentPageNumber];
 }
 
 - (BOOL)setDateValue:(NSDate *)value forKey:(NSString *)key
@@ -216,6 +223,7 @@
         printf("try to store a date before 1970/1/1\n");
         return NO;
     }
+    [self.currentKeySet addObject:key];
     NSUInteger timestamp = [value timeIntervalSince1970];
     return [self setIntValue:timestamp forKey:key];
 }
@@ -235,7 +243,8 @@
 - (BOOL)getBoolValueForKey:(NSString *)key
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
-    NSNumber *number = [self.cacheDictionary objectForKey:key];
+    
+    NSNumber *number = [[self.cacheDictionary objectForKey:CURRENT_PAGE_NAME] objectForKey:key];
     dispatch_semaphore_signal(self.file_operation_lock);
     if (!number) {
         return NO;
@@ -246,7 +255,7 @@
 - (long)getIntValueForKey:(NSString *)key
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
-    NSNumber *number = [self.cacheDictionary objectForKey:key];
+    NSNumber *number = [[self.cacheDictionary objectForKey:CURRENT_PAGE_NAME] objectForKey:key];
     dispatch_semaphore_signal(self.file_operation_lock);
     if (!number) {
         return 0;
@@ -257,7 +266,7 @@
 - (NSString *)getStringValueForKey:(NSString *)key
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
-    id result = [self.cacheDictionary objectForKey:key];
+    id result = [[self.cacheDictionary objectForKey:CURRENT_PAGE_NAME] objectForKey:key];
     dispatch_semaphore_signal(self.file_operation_lock);
     if (result == nil || ![result isKindOfClass:NSString.class]) {
         return nil;
@@ -268,7 +277,7 @@
 - (float)getFloatValueForKey:(NSString *)key
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
-    NSNumber *number = [self.cacheDictionary objectForKey:key];
+    NSNumber *number = [[self.cacheDictionary objectForKey:CURRENT_PAGE_NAME] objectForKey:key];
     dispatch_semaphore_signal(self.file_operation_lock);
     if (!number) {
         return 0;
@@ -279,7 +288,7 @@
 - (nullable NSDate *)getDateValueForKey:(NSString *)key
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
-    NSNumber *number = [self.cacheDictionary objectForKey:key];
+    NSNumber *number = [[self.cacheDictionary objectForKey:CURRENT_PAGE_NAME] objectForKey:key];
     dispatch_semaphore_signal(self.file_operation_lock);
     if (!number) {
         return nil;
@@ -307,10 +316,17 @@
         printf("object does not exist\n");
         return NO;
     } else {
-        dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
-        [self.cacheDictionary removeObjectForKey:key];
-        dispatch_semaphore_signal(self.file_operation_lock);
-        [self _writeToMemory];
+        [self.pageIndexDictionary enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString * _Nonnull pageKey, NSMutableSet * _Nonnull obj, BOOL * _Nonnull stop) {
+            if ([obj containsObject:key]) {
+                NSString *pageNumber = [pageKey substringFromIndex:4];
+                NSMutableDictionary *tempDict = [self.cacheDictionary objectForKey:pageKey];
+                dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
+                [tempDict removeObjectForKey:key];
+                dispatch_semaphore_signal(self.file_operation_lock);
+                [self _writeToMemoryWithPageNumber:pageNumber.integerValue];
+                *stop = YES;
+            }
+        }];
         return YES;
     }
 }
@@ -319,19 +335,27 @@
 
 - (BOOL)preWriteDictToFileWith:(id)object key:(NSString *)key
 {
+    if ([self.cacheDictionary objectForKey:CURRENT_PAGE_NAME] == nil) {
+        NSMutableDictionary *newDict = [[NSMutableDictionary alloc] init];
+        [self.cacheDictionary setObject:newDict forKey:CURRENT_PAGE_NAME];
+    }
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
-    if ([self.cacheDictionary objectForKey:key] != nil) {
+    if ([[self.cacheDictionary objectForKey:CURRENT_PAGE_NAME] objectForKey:key] != nil) {
         printf("object already exist\n");
         dispatch_semaphore_signal(self.file_operation_lock);
         return NO;
     }
-    [self.cacheDictionary setObject:object forKey:key];
+    NSMutableDictionary *tempDict = [self.cacheDictionary objectForKey:CURRENT_PAGE_NAME];
+    [tempDict setObject:object forKey:key];
     if ([self _isWriteDataReachFileSizeLimit]) {
-        //文件到达最大大小
-        printf("file write fail, reason: reach the max file size\n");
-        [self.cacheDictionary removeObjectForKey:key];
+        //文件到达最大大小需要写入下一页
+        printf("change page\n");
+        [tempDict removeObjectForKey:key];
+        [self appendPage];
+        NSMutableDictionary *tempDict = [self.cacheDictionary objectForKey:CURRENT_PAGE_NAME];
+        [tempDict setObject:object forKey:key];
         dispatch_semaphore_signal(self.file_operation_lock);
-        return NO;
+        return YES;
     }
     dispatch_semaphore_signal(self.file_operation_lock);
     return YES;
@@ -455,9 +479,16 @@
     self.file_ptr = memory_ptr;
     //将读出的数据读入内存当中
     if (self.file_ptr) {
-        NSMutableData *data = [NSMutableData dataWithBytes:self.file_ptr length:self.file_size];
-        //反序列化转换出来的是可变对象
-        self.cacheDictionary = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
+        NSInteger pageNumber = ((file_stat.st_size - 1) / MAX_FILE_SIZE) + 1;
+        self.totalPageNumber = pageNumber;
+        for (int i = 0; i < pageNumber; i++) {
+            NSMutableData *data = [NSMutableData dataWithBytes:(self.file_ptr + (i * MAX_FILE_SIZE)) length:MAX_FILE_SIZE];
+            NSDictionary *tempDict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
+            if (tempDict != nil) {
+                [self.cacheDictionary setObject:tempDict forKey:[NSString stringWithFormat:@"dict%d", i]];
+            }
+        }
+        self.currentPageNumber = 0;
     }
     dispatch_semaphore_signal(self.file_operation_lock);
     return memory_ptr;
@@ -465,7 +496,7 @@
 
 #pragma mark - mmap write
 
-- (BOOL)_writeToMemory
+- (BOOL)_writeToMemoryWithPageNumber:(NSInteger)pageNumber
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
     if (self.cacheDictionary == nil) {
@@ -474,19 +505,16 @@
         return NO;
     }
     //序列化
-    NSData *data = [NSJSONSerialization dataWithJSONObject:self.cacheDictionary options:NSJSONWritingSortedKeys error:nil];
+    NSData *data = [NSJSONSerialization dataWithJSONObject:[self.cacheDictionary objectForKey:[NSString stringWithFormat:@"dict%ld", (long)pageNumber]] options:NSJSONWritingSortedKeys error:nil];
     NSMutableData *writeData = [NSMutableData dataWithData:data];
     if (writeData.length > MAX_FILE_SIZE) {
         printf("reach max file size");
         dispatch_semaphore_signal(self.file_operation_lock);
         return NO;
     }
-    self.file_size = writeData.length;
-    //修改文件大小
-    ftruncate(self.file_descriptor, self.file_size);
     //将要写入的内容拷贝到内存的file_ptr所指向的内存当中
     if (self.file_ptr && writeData.mutableBytes && self.file_size > 0 && self.file_ptr != ((void *)-1)) {
-        memcpy(self.file_ptr, writeData.mutableBytes, self.file_size);
+        memcpy(self.file_ptr + (pageNumber * MAX_FILE_SIZE), writeData.mutableBytes, MAX_FILE_SIZE);
         dispatch_semaphore_signal(self.file_operation_lock);
         return YES;
     } else {
@@ -498,12 +526,28 @@
 
 - (BOOL)_isWriteDataReachFileSizeLimit
 {
-    NSData *data = [NSJSONSerialization dataWithJSONObject:self.cacheDictionary options:NSJSONWritingSortedKeys error:nil];
+    if ([self.cacheDictionary objectForKey:CURRENT_PAGE_NAME] == nil) {
+        return NO;
+    }
+    NSData *data = [NSJSONSerialization dataWithJSONObject:[self.cacheDictionary objectForKey:CURRENT_PAGE_NAME] options:NSJSONWritingSortedKeys error:nil];
     if (data && data.length > MAX_FILE_SIZE) {
         [NSNotificationCenter.defaultCenter postNotificationName:kReadyToWriteDataIsReachMaxFileSizeNotification object:data userInfo:self.cacheDictionary];
         return YES;
     }
     return NO;
+}
+
+- (void)appendPage
+{
+    if (self.currentKeySet != nil) {
+        [self.pageIndexDictionary setObject:self.currentKeySet forKey:CURRENT_PAGE_NAME];
+        self.currentPageNumber++;
+        self.currentKeySet = nil;
+        NSMutableDictionary *newDict = [[NSMutableDictionary alloc] init];
+        [self.cacheDictionary setObject:newDict forKey:CURRENT_PAGE_NAME];
+        //修改文件大小
+        ftruncate(self.file_descriptor, self.totalPageNumber * MAX_FILE_SIZE);
+    }
 }
 
 #pragma mark - mmap read
@@ -525,6 +569,22 @@ BOOL is_empty_string(NSString *string)
         _cacheDictionary = [[NSMutableDictionary alloc] init];
     }
     return _cacheDictionary;
+}
+
+- (NSMutableDictionary<NSString *,NSMutableSet *> *)pageIndexDictionary
+{
+    if (_pageIndexDictionary == nil) {
+        _pageIndexDictionary = [[NSMutableDictionary alloc] init];
+    }
+    return _pageIndexDictionary;
+}
+
+- (NSMutableSet *)currentKeySet
+{
+    if (_currentKeySet == nil) {
+        _currentKeySet = [[NSMutableSet alloc] init];
+    }
+    return _currentKeySet;
 }
 
 #pragma mark - debug
