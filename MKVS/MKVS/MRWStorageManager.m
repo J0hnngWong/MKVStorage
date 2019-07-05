@@ -182,6 +182,10 @@
 #pragma mark - mmap map file
 
 //映射之后，我们主要应该拿到映射到内存这部分的开头的指针，以及文件的大小，即映射大小
+//一定保证更换文件之后调用且只调用一次
+
+//最好使用memset去开辟内存
+//使用msync同步文件写入操作
 - (void *)_mapFile
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
@@ -219,13 +223,17 @@
     }
     //建立映射返回指针
     //如果是空文件不能让file_stat.st_size为<nil>
+    self.file_size = file_stat.st_size;
     self.file_off_set = (int32_t)self.file_size;
+    self.page_number = ceilf(file_stat.st_size / MAX_PAGE_SIZE) + 1;
+    size_t temp_file_size = file_stat.st_size;
     if (!file_stat.st_size) {
-        self.file_size = 1;
+        temp_file_size = MAX_PAGE_SIZE;
         self.file_off_set = 0;
+        self.page_number = 1;
+        self.file_size = 0;
     }
-    self.page_number = 1;
-    memory_ptr = mmap(NULL, self.file_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FILE, file_descriptor, 0);
+    memory_ptr = mmap(NULL, temp_file_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FILE, file_descriptor, 0);
     if (memory_ptr == ((void *)-1)) {
         printf("map failed\n");
         self.error_number = errno;
@@ -239,17 +247,13 @@
 - (void *)remap
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
-    if (munmap(self.file_ptr, MAX_PAGE_SIZE) != 0) {
+    if (munmap(self.file_ptr, self.file_size) != 0) {
         printf("fail to munmap file\n");
         dispatch_semaphore_signal(self.file_operation_lock);
         return nil;
     }
-//    size_t oldSize = self.file_size;
-//    self.file_size = 1;
-//    self.file_off_set = 0;
     self.page_number++;
     self.file_ptr = mmap(self.file_ptr, MAX_PAGE_SIZE * self.page_number, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FILE, self.file_descriptor, 0);
-//    memset(self.file_ptr, 0, min_number(self.file_size, MAX_PAGE_SIZE));
     if (self.file_ptr == ((void *)-1)) {
         printf("map failed\n");
         self.error_number = errno;
@@ -325,7 +329,7 @@ BOOL is_empty_string(NSString *string)
     return !string || [string isEqual:[NSNull null]] || isEmpty;
 }
 
-int min_number(long a, long b)
+long min_number(long a, long b)
 {
     if (a > b) {
         return b;
