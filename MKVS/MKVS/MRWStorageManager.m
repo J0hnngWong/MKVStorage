@@ -18,6 +18,9 @@
 @property (strong, nonatomic, readwrite) NSString *filePath;
 @property (strong, nonatomic, readwrite) NSString *fileName;
 
+@property (assign, nonatomic, readwrite) size_t max_file_size;
+@property (assign, nonatomic, readwrite) BOOL block_file_write;
+
 //错误类型
 @property (strong, nonatomic, readwrite) NSError *error;
 //c文件操作需要的变量
@@ -115,6 +118,14 @@
     dispatch_semaphore_signal(self.file_operation_lock);
     return result;
 }
+
+- (void)setMaxFileSize:(size_t)fileSize blockWriteOperation:(BOOL)block
+{
+    self.max_file_size = fileSize;
+    self.block_file_write = block;
+}
+
+#pragma mark - private
 
 - (BOOL)_createDirectoryAndFile
 {
@@ -288,6 +299,14 @@
 
 - (BOOL)_preWriteToMemory:(const char *)log size:(size_t)size
 {
+    if ((self.file_size + size) > self.max_file_size) {
+        if (self.block_file_write) {
+            printf("write to file fail. reason:reach max file size\n");
+            return NO;
+        }
+        //到达设置的最大size，需要发送通知或者执行一个block或者执行协议的方法
+    }
+    
     if ((self.file_size + size) > (MAX_PAGE_SIZE * self.page_number)) {
         printf("reach max page size, will automaticlly move to next page\n");
         if ([self remap] == nil) {

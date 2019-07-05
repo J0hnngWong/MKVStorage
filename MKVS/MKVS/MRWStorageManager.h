@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)removeFileInDefaultPathWithFileName:(nonnull NSString *)fileName;
 - (BOOL)removeFileInPath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName;
 
+- (void)setMaxFileSize:(size_t)fileSize blockWriteOperation:(BOOL)block;
+
 /// write log
 - (void)setLogContent:(NSString *)log;
 
