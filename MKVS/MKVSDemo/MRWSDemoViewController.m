@@ -40,7 +40,7 @@
 
 - (IBAction)benchmarkAction:(id)sender {
     
-    NSInteger writeTimes = 500;
+    NSInteger writeTimes = 100000;
     
     long startTime = [[NSDate date] timeIntervalSince1970] * 10000000;
     long endTime = [[NSDate date] timeIntervalSince1970] * 10000000;

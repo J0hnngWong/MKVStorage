@@ -10,7 +10,7 @@
 #import <sys/mman.h>
 #import <sys/stat.h>
 
-#define MAX_PAGE_SIZE 4096
+#define MAX_PAGE_SIZE getpagesize()
 
 @interface MRWStorageManager()
 
@@ -210,6 +210,7 @@
         return nil;
     }
     //同步文件读写操作
+//    msync(self.file_ptr, self.file_size, 0);
     if (fsync(file_descriptor) != 0) {
         printf("fail to synchronize the read write to file\n");
         self.error_number = errno;
@@ -223,8 +224,8 @@
         self.file_size = 1;
         self.file_off_set = 0;
     }
-    self.page_number = 0;
-    memory_ptr = mmap(NULL, self.file_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FILE, file_descriptor, MAX_PAGE_SIZE * self.page_number);
+    self.page_number = 1;
+    memory_ptr = mmap(NULL, self.file_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FILE, file_descriptor, 0);
     if (memory_ptr == ((void *)-1)) {
         printf("map failed\n");
         self.error_number = errno;
@@ -238,16 +239,17 @@
 - (void *)remap
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
-    if (munmap(self.file_ptr, self.file_size) != 0) {
+    if (munmap(self.file_ptr, MAX_PAGE_SIZE) != 0) {
         printf("fail to munmap file\n");
         dispatch_semaphore_signal(self.file_operation_lock);
         return nil;
     }
-    size_t oldSize = self.file_size;
-    self.file_size = 1;
-    self.file_off_set = 0;
+//    size_t oldSize = self.file_size;
+//    self.file_size = 1;
+//    self.file_off_set = 0;
     self.page_number++;
-    self.file_ptr = mmap(self.file_ptr, self.file_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FILE, self.file_descriptor, MAX_PAGE_SIZE * self.page_number);
+    self.file_ptr = mmap(self.file_ptr, MAX_PAGE_SIZE * self.page_number, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FILE, self.file_descriptor, 0);
+//    memset(self.file_ptr, 0, min_number(self.file_size, MAX_PAGE_SIZE));
     if (self.file_ptr == ((void *)-1)) {
         printf("map failed\n");
         self.error_number = errno;
@@ -282,12 +284,13 @@
 
 - (BOOL)_preWriteToMemory:(const char *)log size:(size_t)size
 {
-    if (self.file_size + size > MAX_PAGE_SIZE) {
+    if ((self.file_size + size) > (MAX_PAGE_SIZE * self.page_number)) {
         printf("reach max page size, will automaticlly move to next page\n");
         if ([self remap] == nil) {
             printf("remap fail\n");
             return NO;
         }
+        [self setLogContent:[NSString stringWithUTF8String:log]];
         return YES;
     }
     return YES;
@@ -320,6 +323,15 @@ BOOL is_empty_string(NSString *string)
     NSCharacterSet *aCharacterSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     BOOL isEmpty = ([string isKindOfClass:[NSString class]] && [@"" isEqualToString:[string stringByTrimmingCharactersInSet:aCharacterSet]]);
     return !string || [string isEqual:[NSNull null]] || isEmpty;
+}
+
+int min_number(long a, long b)
+{
+    if (a > b) {
+        return b;
+    } else {
+        return a;
+    }
 }
 
 #pragma mark - debug
