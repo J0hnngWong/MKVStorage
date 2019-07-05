@@ -23,14 +23,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// init
 - (instancetype)init;
 - (instancetype)initWithFilePath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName;
+- (instancetype)initWithFilePath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName maxFileSize:(size_t)fileSize blockWriteOperation:(BOOL)block;
 
 /// file operation
 - (void)setWorkFileName:(nonnull NSString *)fileName;
 - (void)setWorkPath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName;
 - (BOOL)removeFileInDefaultPathWithFileName:(nonnull NSString *)fileName;
 - (BOOL)removeFileInPath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName;
-
-- (void)setMaxFileSize:(size_t)fileSize blockWriteOperation:(BOOL)block;
 
 /// write log
 - (void)setLogContent:(NSString *)log;

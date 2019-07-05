@@ -43,6 +43,8 @@
     self = [super init];
     if (self) {
         self.file_operation_lock = dispatch_semaphore_create(1);
+        self.max_file_size = INT_MAX;
+        self.block_file_write = NO;
         [self setWorkPath:MRWSDefaultFilePath fileName:MRWSDefaultFileName];
     }
     return self;
@@ -53,6 +55,20 @@
     self = [super init];
     if (self) {
         self.file_operation_lock = dispatch_semaphore_create(1);
+        self.max_file_size = INT_MAX;
+        self.block_file_write = NO;
+        [self setWorkPath:path fileName:fileName];
+    }
+    return self;
+}
+
+- (instancetype)initWithFilePath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName maxFileSize:(size_t)fileSize blockWriteOperation:(BOOL)block
+{
+    self = [super init];
+    if (self) {
+        self.file_operation_lock = dispatch_semaphore_create(1);
+        self.max_file_size = fileSize;
+        self.block_file_write = block;
         [self setWorkPath:path fileName:fileName];
     }
     return self;
@@ -117,12 +133,6 @@
     BOOL result = [NSFileManager.defaultManager removeItemAtPath:fileFullPath error:nil];
     dispatch_semaphore_signal(self.file_operation_lock);
     return result;
-}
-
-- (void)setMaxFileSize:(size_t)fileSize blockWriteOperation:(BOOL)block
-{
-    self.max_file_size = fileSize;
-    self.block_file_write = block;
 }
 
 #pragma mark - private
