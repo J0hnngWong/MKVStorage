@@ -16,7 +16,7 @@
 //最好可以用设备号做记录
 #define MRWSDefaultFileName @"defaultStorage"
 
-typedef void(^MRWSReachMaxFileSizeHandler)(NSInteger fileCount,  NSString * _Nonnull fileName);
+typedef void(^MRWSReachMaxFileSizeHandler)(NSInteger fileCount,  NSString * _Nonnull filePath, NSString * _Nonnull fileName);
 
 NS_ASSUME_NONNULL_BEGIN
 
