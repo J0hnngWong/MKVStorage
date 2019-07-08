@@ -19,7 +19,8 @@
 @property (strong, nonatomic, readwrite) NSString *fileName;
 
 @property (assign, nonatomic, readwrite) size_t max_file_size;
-@property (assign, nonatomic, readwrite) BOOL block_file_write;
+//@property (assign, nonatomic, readwrite) BOOL block_file_write;
+@property (assign, nonatomic, readwrite) NSInteger fileCount;
 
 //错误类型
 @property (strong, nonatomic, readwrite) NSError *error;
@@ -44,7 +45,8 @@
     if (self) {
         self.file_operation_lock = dispatch_semaphore_create(1);
         self.max_file_size = INT_MAX;
-        self.block_file_write = NO;
+        self.fileCount = 0;
+        self.reachMaxFileSizeHandler = nil;
         [self setWorkPath:MRWSDefaultFilePath fileName:MRWSDefaultFileName];
     }
     return self;
@@ -56,19 +58,21 @@
     if (self) {
         self.file_operation_lock = dispatch_semaphore_create(1);
         self.max_file_size = INT_MAX;
-        self.block_file_write = NO;
+        self.fileCount = 0;
+        self.reachMaxFileSizeHandler = nil;
         [self setWorkPath:path fileName:fileName];
     }
     return self;
 }
 
-- (instancetype)initWithFilePath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName maxFileSize:(size_t)fileSize blockWriteOperation:(BOOL)block
+- (instancetype)initWithFilePath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName maxFileSize:(size_t)fileSize;
 {
     self = [super init];
     if (self) {
         self.file_operation_lock = dispatch_semaphore_create(1);
         self.max_file_size = fileSize;
-        self.block_file_write = block;
+        self.fileCount = 0;
+        self.reachMaxFileSizeHandler = nil;
         [self setWorkPath:path fileName:fileName];
     }
     return self;
@@ -83,8 +87,13 @@
 
 - (void)setWorkPath:(NSString *)path fileName:(NSString *)fileName
 {
+    if ([self.fileName isEqualToString:fileName] && [self.filePath isEqualToString:path]) {
+        printf("file path and name are same with the last one\n");
+        return;
+    }
     self.filePath = path;
     self.fileName = fileName;
+    self.fileCount++;
     __block void *temp_file_ptr = nil;
     if (self.file_ptr != nil && self.file_ptr != ((void *)-1)) {
         [self unmapAndCloseFile];
@@ -188,16 +197,17 @@
 }
 
 #pragma mark - write log
-- (void)setLogContent:(NSString *)log
+- (BOOL)setLogContent:(NSString *)log
 {
-    if (![self _preWriteToMemory:log.UTF8String size:log.length]) {
+    if (![self _preWriteToMemory:log.UTF8String size:log.length isRetry:NO]) {
         printf("fail to pre write to memory");
-        return;
+        return NO;
     }
     if (![self _writeToMemory:log.UTF8String size:log.length]) {
         printf("failt to write to memory");
-        return;
+        return NO;
     }
+    return YES;
 }
 
 #pragma mark - mmap map file
@@ -307,24 +317,34 @@
 
 #pragma mark - write to memory
 
-- (BOOL)_preWriteToMemory:(const char *)log size:(size_t)size
+- (BOOL)_preWriteToMemory:(const char *)log size:(size_t)size isRetry:(BOOL)retry
 {
+    if (size > self.max_file_size) {
+        printf("the log to be written is bigger than max file size\n");
+        return NO;
+    }
     if ((self.file_size + size) > self.max_file_size) {
-        if (self.block_file_write) {
-            printf("write to file fail. reason:reach max file size\n");
+        if (retry || self.reachMaxFileSizeHandler == nil) {
+            printf("write to file fail. reason:reach max file size and do not change file\n");
             return NO;
+        }
+        if (self.reachMaxFileSizeHandler) {
+            NSInteger tempFileCount = self.fileCount;
+            NSString *tempFileName = self.fileName.copy;
+            self.reachMaxFileSizeHandler(tempFileCount, tempFileName);
+            return [self _preWriteToMemory:log size:size isRetry:YES];
         }
         //到达设置的最大size，需要发送通知或者执行一个block或者执行协议的方法
     }
     
     if ((self.file_size + size) > (MAX_PAGE_SIZE * self.page_number)) {
-        printf("reach max page size, will automaticlly move to next page\n");
+//        printf("reach max page size, will automaticlly move to next page\n");
         if ([self remap] == nil) {
             printf("remap fail\n");
             return NO;
         }
-        [self setLogContent:[NSString stringWithUTF8String:log]];
-        return YES;
+//        [self setLogContent:[NSString stringWithUTF8String:log]];
+        return YES; //这边返回了YES会让上次的检测通过并且写入
     }
     return YES;
 }

@@ -48,13 +48,22 @@
                         <action selector="benchmarkAction:" destination="-1" eventType="touchUpInside" id="csS-ML-FlV"/>
                     </connections>
                 </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MOh-kf-4bh">
+                    <rect key="frame" x="144" y="237" width="126" height="30"/>
+                    <state key="normal" title="MultiFile write test"/>
+                    <connections>
+                        <action selector="multiFileWriteButton:" destination="-1" eventType="touchUpInside" id="bWb-Ba-I3q"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="nMw-YD-xdy" firstAttribute="top" secondItem="nO7-ZR-5a3" secondAttribute="bottom" constant="29" id="5Q5-lV-xwF"/>
                 <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="Kbq-S4-QvY" secondAttribute="trailing" constant="20" id="A6y-v1-mqK"/>
                 <constraint firstItem="nO7-ZR-5a3" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="DSt-89-lyv"/>
+                <constraint firstItem="MOh-kf-4bh" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="SsU-KT-IzG"/>
                 <constraint firstItem="nO7-ZR-5a3" firstAttribute="top" secondItem="Kbq-S4-QvY" secondAttribute="bottom" constant="51" id="XgW-XL-rka"/>
+                <constraint firstItem="Kbq-S4-QvY" firstAttribute="top" secondItem="MOh-kf-4bh" secondAttribute="bottom" constant="90" id="cVH-cB-GZ2"/>
                 <constraint firstItem="Kbq-S4-QvY" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="daM-ih-Y9Y"/>
                 <constraint firstItem="nO7-ZR-5a3" firstAttribute="centerY" secondItem="Q5M-cg-NOt" secondAttribute="centerY" id="kuB-l9-qdq"/>
                 <constraint firstItem="JiY-1Z-UnG" firstAttribute="top" secondItem="nMw-YD-xdy" secondAttribute="bottom" constant="72" id="z4e-r7-YEM"/>

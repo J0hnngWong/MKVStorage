@@ -63,6 +63,23 @@
     NSLog(@"nfmanager : %ld", endTime - startTime);
 }
 
+- (IBAction)multiFileWriteButton:(id)sender {
+    
+    MRWStorageManager *multiFileManager = [[MRWStorageManager alloc] initWithFilePath:MRWSDefaultFilePath fileName:@"Dict" maxFileSize:20000];
+    __weak MRWStorageManager *__weak_multiFileManager = multiFileManager;
+    multiFileManager.reachMaxFileSizeHandler = ^(NSInteger fileCount, NSString * _Nonnull fileName) {
+        MRWStorageManager *multiFileManager = __weak_multiFileManager;
+        [multiFileManager setWorkPath:MRWSDefaultFilePath fileName:[NSString stringWithFormat:@"Dict%ld", fileCount]];
+    };
+    
+    for (int i = 0; 1; i++) {
+        if (![multiFileManager setLogContent:[NSString stringWithFormat:@"log %d\n", i]]) {
+            break;
+        }
+    }
+}
+
+
 - (MRWStorageManager *)manager
 {
     if (_manager == nil) {

@@ -16,14 +16,18 @@
 //最好可以用设备号做记录
 #define MRWSDefaultFileName @"defaultStorage"
 
+typedef void(^MRWSReachMaxFileSizeHandler)(NSInteger fileCount,  NSString * _Nonnull fileName);
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MRWStorageManager : NSObject
 
+@property (nullable, copy, nonatomic) MRWSReachMaxFileSizeHandler reachMaxFileSizeHandler;
+
 /// init
 - (instancetype)init;
 - (instancetype)initWithFilePath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName;
-- (instancetype)initWithFilePath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName maxFileSize:(size_t)fileSize blockWriteOperation:(BOOL)block;
+- (instancetype)initWithFilePath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName maxFileSize:(size_t)fileSize;
 
 /// file operation
 - (void)setWorkFileName:(nonnull NSString *)fileName;
@@ -32,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)removeFileInPath:(nonnull NSString *)path fileName:(nonnull NSString *)fileName;
 
 /// write log
-- (void)setLogContent:(NSString *)log;
+- (BOOL)setLogContent:(NSString *)log;
 
 /// map
 - (void)unmapAndCloseFile;
