@@ -67,7 +67,7 @@
     
     MRWStorageManager *multiFileManager = [[MRWStorageManager alloc] initWithFilePath:MRWSDefaultFilePath fileName:@"Dict" maxFileSize:20000];
     __weak MRWStorageManager *__weak_multiFileManager = multiFileManager;
-    multiFileManager.reachMaxFileSizeHandler = ^(NSInteger fileCount, NSString * _Nonnull fileName) {
+    multiFileManager.reachMaxFileSizeHandler = ^(NSInteger fileCount, NSString * _Nonnull filePath, NSString * _Nonnull fileName) {
         MRWStorageManager *multiFileManager = __weak_multiFileManager;
         [multiFileManager setWorkPath:MRWSDefaultFilePath fileName:[NSString stringWithFormat:@"Dict%ld", fileCount]];
     };

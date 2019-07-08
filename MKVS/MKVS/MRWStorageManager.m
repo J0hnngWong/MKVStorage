@@ -330,8 +330,9 @@
         }
         if (self.reachMaxFileSizeHandler) {
             NSInteger tempFileCount = self.fileCount;
+            NSString *tempFilePath = self.filePath.copy;
             NSString *tempFileName = self.fileName.copy;
-            self.reachMaxFileSizeHandler(tempFileCount, tempFileName);
+            self.reachMaxFileSizeHandler(tempFileCount, tempFilePath, tempFileName);
             return [self _preWriteToMemory:log size:size isRetry:YES];
         }
         //到达设置的最大size，需要发送通知或者执行一个block或者执行协议的方法
