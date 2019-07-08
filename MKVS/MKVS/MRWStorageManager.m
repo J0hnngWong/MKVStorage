@@ -70,6 +70,9 @@
     self = [super init];
     if (self) {
         self.file_operation_lock = dispatch_semaphore_create(1);
+        if (fileSize > (size_t)-1) {
+            fileSize = (size_t)-1;
+        }
         self.max_file_size = fileSize;
         self.fileCount = 0;
         self.reachMaxFileSizeHandler = nil;
@@ -200,11 +203,11 @@
 - (BOOL)setLogContent:(NSString *)log
 {
     if (![self _preWriteToMemory:log.UTF8String size:log.length isRetry:NO]) {
-        printf("fail to pre write to memory");
+        printf("fail to pre write to memory\n");
         return NO;
     }
     if (![self _writeToMemory:log.UTF8String size:log.length]) {
-        printf("failt to write to memory");
+        printf("failt to write to memory\n");
         return NO;
     }
     return YES;

@@ -6,6 +6,11 @@
 //  Copyright © 2019 Johnny. All rights reserved.
 //
 
+/*
+ the max file size by default is MAX_INT which is almost 2 GigaBytes
+ the max file size is (size_t)-1 and in C99 is SIZE_MAX AKA 18446744073709551615
+*/
+
 #import <Foundation/Foundation.h>
 
 #define kMRWSReadyToWriteDataIsReachMaxFileSizeNotification @"MRWSReadyToWriteDataIsReachMaxFileSizeNotification"
