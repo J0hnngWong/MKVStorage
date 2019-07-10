@@ -42,9 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// write log
 - (BOOL)setLogContent:(NSString *)log;
+- (void)setLogContentAsync:(NSString *)log;
 
 /// map
-- (void)unmapAndCloseFile;
+- (BOOL)unmapAndCloseFile;
 
 /// debug
 - (void)printFilePath;

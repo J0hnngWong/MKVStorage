@@ -46,6 +46,7 @@
         self.file_operation_lock = dispatch_semaphore_create(1);
         self.max_file_size = INT_MAX;
         self.fileCount = 0;
+        [self cleanFileInfo];
         self.reachMaxFileSizeHandler = nil;
         [self setWorkPath:MRWSDefaultFilePath fileName:MRWSDefaultFileName];
     }
@@ -59,6 +60,7 @@
         self.file_operation_lock = dispatch_semaphore_create(1);
         self.max_file_size = INT_MAX;
         self.fileCount = 0;
+        [self cleanFileInfo];
         self.reachMaxFileSizeHandler = nil;
         [self setWorkPath:path fileName:fileName];
     }
@@ -75,6 +77,7 @@
         }
         self.max_file_size = fileSize;
         self.fileCount = 0;
+        [self cleanFileInfo];
         self.reachMaxFileSizeHandler = nil;
         [self setWorkPath:path fileName:fileName];
     }
@@ -94,13 +97,13 @@
         printf("file path and name are same with the last one\n");
         return;
     }
+    if (self.file_ptr != nil && self.file_ptr != ((void *)-1)) {
+        [self unmapAndCloseFile];
+    }
     self.filePath = path;
     self.fileName = fileName;
     self.fileCount++;
     __block void *temp_file_ptr = nil;
-    if (self.file_ptr != nil && self.file_ptr != ((void *)-1)) {
-        [self unmapAndCloseFile];
-    }
     if (![self _createDirectoryAndFile]) {
         printf("fail to create file\n");
         return;
@@ -144,6 +147,43 @@
     }
     BOOL result = [NSFileManager.defaultManager removeItemAtPath:fileFullPath error:nil];
     dispatch_semaphore_signal(self.file_operation_lock);
+    return result;
+}
+
+- (void)cleanFileInfo
+{
+    self.filePath = nil;
+    self.fileName = nil;
+    self.file_ptr = nil;
+    self.page_number = 0;
+    self.file_off_set = 0;
+    self.file_descriptor = 0;
+    self.file_size = 0;
+}
+
+- (NSArray<NSString *> *)fileNameArrayInPath:(NSString *)path
+{
+    //ignore subpath
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL isDir = NO;
+    BOOL isExist = [fileManager fileExistsAtPath:path isDirectory:&isDir];
+    if (!isExist) {
+        return nil;
+    }
+    if (!isDir) {
+        return nil;
+    }
+    NSMutableArray *result = [[NSMutableArray alloc] initWithArray:@[]];
+    NSArray<NSString *> *pathContents = [fileManager contentsOfDirectoryAtPath:path error:nil].copy;
+    for (NSString *contentName in pathContents) {
+        BOOL isDir = NO;
+        NSString *fullPath = [path stringByAppendingPathComponent:contentName];
+        if ([fileManager fileExistsAtPath:fullPath isDirectory:&isDir]) {
+            if (!isDir) {
+                [result addObject:contentName];
+            }
+        }
+    }
     return result;
 }
 
@@ -202,6 +242,10 @@
 #pragma mark - write log
 - (BOOL)setLogContent:(NSString *)log
 {
+    if (is_empty_string(self.filePath) || is_empty_string(self.fileName)) {
+        printf("not map to any file\n");
+        return NO;
+    }
     if (![self _preWriteToMemory:log.UTF8String size:log.length isRetry:NO]) {
         printf("fail to pre write to memory\n");
         return NO;
@@ -211,6 +255,13 @@
         return NO;
     }
     return YES;
+}
+
+- (void)setLogContentAsync:(NSString *)log
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        [self setLogContent:log];
+    });
 }
 
 #pragma mark - mmap map file
@@ -259,15 +310,16 @@
     //如果是空文件不能让file_stat.st_size为<nil>
     self.file_size = file_stat.st_size;
     self.file_off_set = (int32_t)self.file_size;
-    self.page_number = ceilf(file_stat.st_size / MAX_PAGE_SIZE) + 1;
+    self.page_number = ceilf(file_stat.st_size / MAX_PAGE_SIZE) + 2;
     size_t temp_file_size = file_stat.st_size;
     if (!file_stat.st_size) {
         temp_file_size = MAX_PAGE_SIZE;
         self.file_off_set = 0;
-        self.page_number = 1;
+        self.page_number = 2;
         self.file_size = 0;
     }
-    memory_ptr = mmap(NULL, temp_file_size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FILE, file_descriptor, 0);
+    //当大小小于一页时初始映射一页 页数设置为1，等于一页和大于一页时映射两页 页数设置为2或者更多
+    memory_ptr = mmap(NULL, MAX_PAGE_SIZE * self.page_number, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FILE, file_descriptor, 0);
     if (memory_ptr == ((void *)-1)) {
         printf("map failed\n");
         self.error_number = errno;
@@ -299,23 +351,25 @@
 }
 
 #pragma mark - unmap and close file
-- (void)unmapAndCloseFile
+- (BOOL)unmapAndCloseFile
 {
     dispatch_semaphore_wait(self.file_operation_lock, DISPATCH_TIME_FOREVER);
     if (self.file_ptr == nil || self.file_descriptor < 0) {
         printf("file unmap fail\n");
         self.error_number = errno;
-        return;
+        return NO;
     }
     if (munmap(self.file_ptr, self.file_size) != 0) {
         printf("fail to unmap the file\n");
-        return;
+        return NO;
     }
     if (close(self.file_descriptor) != 0) {
         printf("fail to close the file\n");
-        return;
+        return NO;
     }
+    [self cleanFileInfo];
     dispatch_semaphore_signal(self.file_operation_lock);
+    return YES;
 }
 
 #pragma mark - write to memory
@@ -326,7 +380,7 @@
         printf("the log to be written is bigger than max file size\n");
         return NO;
     }
-    if ((self.file_size + size) > self.max_file_size) {
+    if ((self.file_size + size) >= self.max_file_size) {
         if (retry || self.reachMaxFileSizeHandler == nil) {
             printf("write to file fail. reason:reach max file size and do not change file\n");
             return NO;
@@ -341,7 +395,7 @@
         //到达设置的最大size，需要发送通知或者执行一个block或者执行协议的方法
     }
     
-    if ((self.file_size + size) > (MAX_PAGE_SIZE * self.page_number)) {
+    if ((self.file_size + size) > (MAX_PAGE_SIZE * (self.page_number - 1))) {
 //        printf("reach max page size, will automaticlly move to next page\n");
         if ([self remap] == nil) {
             printf("remap fail\n");
